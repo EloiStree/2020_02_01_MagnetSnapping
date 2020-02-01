@@ -33,10 +33,21 @@ public class ActivableMagnet : MonoBehaviour
         List<MagnetFixAnchor> fixmags = MagnetAnchorUtility.CheckForFixMagnet(m_linkedTransform.position, radius, m_affectable);
         if (fixmags.Count > 0)
         {
-            if(GetActiveMagnetAround(m_minDistanceofOtherToSnap) <1)
+            if(IsOnlyInRegion(m_minDistanceofOtherToSnap))
             Snap(fixmags);
 
         }
+    }
+
+    private bool IsOnlyInRegion(float radius)
+    {
+        List<ActivableMagnet> magnet = MagnetAnchorUtility.CheckForActivableMagnet(m_linkedTransform.position, radius);
+       if (magnet.Count == 0)
+            return true;
+        if (magnet.Count == 1 && magnet[0] == this)
+            return true;
+        return false;
+
     }
 
     private int GetActiveMagnetAround(float radius)
