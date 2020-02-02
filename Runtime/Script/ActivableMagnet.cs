@@ -24,22 +24,32 @@ public class ActivableMagnet : MonoBehaviour
         m_activesMagnetInScene.Remove(this);
     }
 
-    public bool SnapToFixMagnetAroundWithDefaultParameters()
+    public void SnapToFixMagnetAroundWithDefaultParameters()
     {
-        return SnapToFixMagnetAtRangeWithDefaultParameters(m_radius);
+        bool found;
+         SnapToFixMagnetAtRangeWithDefaultParameters(m_radius, out found);
     }
-    public bool SnapToFixMagnetAtRangeWithDefaultParameters(float radius)
+    public void SnapToFixMagnetAroundWithDefaultParameters(out bool found)
     {
+         SnapToFixMagnetAtRangeWithDefaultParameters(m_radius, out found);
+    }
+    public void SnapToFixMagnetAtRangeWithDefaultParameters(float radius )
+    {
+        bool found;
+        SnapToFixMagnetAtRangeWithDefaultParameters(radius, out found);
+    }
+        public void SnapToFixMagnetAtRangeWithDefaultParameters(float radius, out bool found)
+    {
+        found = false;
         List<MagnetFixAnchor> fixmags = MagnetAnchorUtility.CheckForFixMagnet(m_linkedTransform.position, radius, m_affectable);
         if (fixmags.Count > 0)
         {
             if (IsOnlyInRegion(m_minDistanceofOtherToSnap))
             {
                 Snap(fixmags);
-                return true;
+                found= true;
             }
         }
-        return false;
     }
 
     private bool IsOnlyInRegion(float radius)
