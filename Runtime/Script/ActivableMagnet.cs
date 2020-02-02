@@ -9,10 +9,10 @@ public class ActivableMagnet : MonoBehaviour
 
     public static List<ActivableMagnet> m_activesMagnetInScene = new List<ActivableMagnet>();
     public Transform m_linkedTransform;
-    public float m_radius=1;
+    public float m_radius = 1;
     public LayerMask m_affectable = -1;
     public bool m_snapToParent;
-    public float m_minDistanceofOtherToSnap= 0.003f;
+    public float m_minDistanceofOtherToSnap = 0.003f;
 
 
     public void OnEnable()
@@ -24,25 +24,28 @@ public class ActivableMagnet : MonoBehaviour
         m_activesMagnetInScene.Remove(this);
     }
 
-    public void SnapToFixMagnetAroundWithDefaultParameters()
+    public bool SnapToFixMagnetAroundWithDefaultParameters()
     {
-        SnapToFixMagnetAtRangeWithDefaultParameters(m_radius);
+        return SnapToFixMagnetAtRangeWithDefaultParameters(m_radius);
     }
-    public void SnapToFixMagnetAtRangeWithDefaultParameters(float radius)
+    public bool SnapToFixMagnetAtRangeWithDefaultParameters(float radius)
     {
         List<MagnetFixAnchor> fixmags = MagnetAnchorUtility.CheckForFixMagnet(m_linkedTransform.position, radius, m_affectable);
         if (fixmags.Count > 0)
         {
-            if(IsOnlyInRegion(m_minDistanceofOtherToSnap))
-            Snap(fixmags);
-
+            if (IsOnlyInRegion(m_minDistanceofOtherToSnap))
+            {
+                Snap(fixmags);
+                return true;
+            }
         }
+        return false;
     }
 
     private bool IsOnlyInRegion(float radius)
     {
         List<ActivableMagnet> magnet = MagnetAnchorUtility.CheckForActivableMagnet(m_linkedTransform.position, radius);
-       if (magnet.Count == 0)
+        if (magnet.Count == 0)
             return true;
         if (magnet.Count == 1 && magnet[0] == this)
             return true;
@@ -52,10 +55,11 @@ public class ActivableMagnet : MonoBehaviour
 
     private int GetActiveMagnetAround(float radius)
     {
-        return MagnetAnchorUtility.CheckForActivableMagnet(m_linkedTransform.position, radius).Count ;
+        return MagnetAnchorUtility.CheckForActivableMagnet(m_linkedTransform.position, radius).Count;
     }
 
-    public void Unparent() {
+    public void Unparent()
+    {
         transform.parent = null;
     }
 
@@ -77,9 +81,13 @@ public class ActivableMagnet : MonoBehaviour
     {
         return m_linkedTransform.position;
     }
+
+
+
 }
 
-public class MagnetAnchorUtility {
+public class MagnetAnchorUtility
+{
     public static List<MagnetFixAnchor> CheckForFixMagnet(Vector3 where, float radius, LayerMask layer)
     {
         List<MagnetFixAnchor> anchors = new List<MagnetFixAnchor>();
@@ -97,7 +105,7 @@ public class MagnetAnchorUtility {
     public static List<ActivableMagnet> CheckForActivableMagnet(Vector3 where, float radius)
     {
         List<ActivableMagnet> anchors = ActivableMagnet.m_activesMagnetInScene;
-        anchors = anchors.Where(k=>Vector3.Distance(where, k.GetPosition())<radius).OrderBy(k => Vector3.Distance(k.GetPosition(), where)).ToList();
+        anchors = anchors.Where(k => Vector3.Distance(where, k.GetPosition()) < radius).OrderBy(k => Vector3.Distance(k.GetPosition(), where)).ToList();
         return anchors;
     }
 
@@ -106,3 +114,5 @@ public class MagnetAnchorUtility {
         return layermask == (layermask | (1 << layer));
     }
 }
+
+
